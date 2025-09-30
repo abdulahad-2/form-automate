@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: form-automate
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: ADMIN_EMAIL
+        description: Admin email to receive form submissions
+      - key: FROM_EMAIL
+        description: Sender email (must be a Gmail address)
+      - key: GMAIL_CREDENTIALS
+        description: Contents of credentials.json from Google Cloud Console
+        sync: false
+      - key: GMAIL_TOKEN
+        description: Base64 encoded token.pickle (generate with `python -c "import base64; print(base64.b64encode(open('token.pickle', 'rb').read()).decode('utf-8'))"`)
+        sync: false
+    plan: free

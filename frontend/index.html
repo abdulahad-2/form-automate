@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Form test</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+    label { display:block; margin-top: 12px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 6px; box-sizing: border-box; }
+    button { margin-top: 12px; padding: 10px 16px; }
+    .msg { margin-top: 12px; padding: 10px; border-radius: 6px; }
+    .success { background:#e6ffed; border:1px solid #2ecc71; }
+    .error { background:#ffe6e6; border:1px solid #ff4d4d; }
+  </style>
+</head>
+<body>
+  <h2>Test Form — Universal Form Collector</h2>
+  <p>Fill this and it will POST JSON to your backend's <code>/submit-form</code>.</p>
+
+  <form id="testForm" method="POST">
+    <label>
+      Name
+      <input type="text" name="name" required />
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" required />
+    </label>
+
+    <label>
+      Message
+      <textarea name="message" rows="5"></textarea>
+    </label>
+
+    <label>
+      Extra field (any)
+      <input type="text" name="extra" />
+    </label>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="status" class="msg" style="display:none"></div>
+
+<script>
+const backendUrl = "https://form-automate.onrender.com/submit-form";
+const form = document.getElementById("testForm");
+
+// Handle form submission
+form.addEventListener("submit", async (e) => {
+  e.preventDefault(); // Prevent default form submission
+  
+  // Get form data
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+  
+  console.log('Submitting form data:', data);
+  const statusEl = document.getElementById("status");
+  statusEl.style.display = "none";
+
+  try {
+    console.log('Making POST request to:', backendUrl);
+    console.log('Request payload:', data);
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    console.log('Response status:', response.status);
+    const responseData = await response.json().catch(() => ({}));
+    console.log('Response data:', responseData);
+    
+    if (!response.ok) {
+      throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    if (responseData.status === "success") {
+      statusEl.className = "msg success";
+      statusEl.textContent = "Submitted successfully. Check admin email (and auto-reply if email provided).";
+      form.reset(); // Clear the form on success
+    } else {
+      throw new Error(responseData.message || "Unknown error occurred");
+    }
+  } catch (err) {
+    statusEl.className = "msg error";
+    statusEl.textContent = `Error: ${err.message}. Please check console for details.`;
+    console.error("Form submission error:", err);
+  } finally {
+    statusEl.style.display = "block";
+  }
+});
+</script>
