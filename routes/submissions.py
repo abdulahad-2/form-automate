@@ -257,7 +257,11 @@ async def send_legacy_admin_email(submission_data: Dict[str, Any], email_value: 
     try:
         from os import getenv
         from gmail_service import GmailService
-        from settings import settings
+        import pydantic_settings
+
+        # Get settings from environment
+        ADMIN_EMAIL = getenv("ADMIN_EMAIL", "admin@example.com")
+        FROM_EMAIL = getenv("FROM_EMAIL", "noreply@example.com")
 
         # Format payload
         lines = []
@@ -269,10 +273,10 @@ async def send_legacy_admin_email(submission_data: Dict[str, Any], email_value: 
         # Send using existing Gmail service
         gmail_service = GmailService()
         result = gmail_service.send_email(
-            to_email=settings.ADMIN_EMAIL,
+            to_email=ADMIN_EMAIL,
             subject=subject,
             body=formatted,
-            from_email=settings.FROM_EMAIL
+            from_email=FROM_EMAIL
         )
 
         if result["status"] == "error":
@@ -286,7 +290,8 @@ async def send_legacy_auto_reply(email: str):
     try:
         from os import getenv
         from gmail_service import GmailService
-        from settings import settings
+
+        FROM_EMAIL = getenv("FROM_EMAIL", "noreply@example.com")
 
         subject = "We've received your submission"
         body = (
@@ -299,7 +304,7 @@ async def send_legacy_auto_reply(email: str):
             to_email=email,
             subject=subject,
             body=body,
-            from_email=settings.FROM_EMAIL
+            from_email=FROM_EMAIL
         )
 
         if result["status"] == "error":
