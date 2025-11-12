@@ -1,3 +1,3 @@
-from . import auth, forms, submissions
+from . import auth, forms, submissions, templates, campaigns, uploads, analytics
 
-__all__ = ["auth", "forms", "submissions"]
+__all__ = ["auth", "forms", "submissions", "templates", "campaigns", "uploads", "analytics"]
