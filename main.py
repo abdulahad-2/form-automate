@@ -129,10 +129,14 @@ async def shutdown_event():
     except Exception as e:
         logging.error(f"Error during shutdown: {str(e)}")
 
-# Include new API routes
+# Include all API routes
 app.include_router(auth.router)
 app.include_router(forms.router)
 app.include_router(submissions.router)
+app.include_router(templates.router)
+app.include_router(campaigns.router)
+app.include_router(uploads.router)
+app.include_router(analytics.router)
 
 # Legacy form submission endpoints for backward compatibility
 def format_payload(payload: Dict[str, Any]) -> str:
